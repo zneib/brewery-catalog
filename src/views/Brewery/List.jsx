@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function BreweryList() {
   const [breweries, setBreweries] = useState([]);
+  const [searchedBreweries, setSearchedBreweries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortingToggle, setSortingToggle] = useState('Ascending');
 
@@ -11,7 +12,9 @@ export default function BreweryList() {
       try {
         const res = await fetch(`https://api.openbrewerydb.org/breweries?per_page=10`);
         const data = await res.json();
-        const sortedData = sortingToggle === 'Ascending' ? data.sort((a, b) => a.name.localeCompare(b.name)) : data.sort((a, b) => b.name.localeCompare(a.name));
+        const sortedData = sortingToggle === 'Ascending' 
+          ? data.sort((a, b) => a.name.localeCompare(b.name)) 
+          : data.sort((a, b) => b.name.localeCompare(a.name));
         setBreweries(sortedData);
       } catch (error) {
         console.error(error);
@@ -23,12 +26,24 @@ export default function BreweryList() {
     getBreweryList();
   }, [getBreweryList])
 
+  useEffect(() => {
+    if (searchedBreweries?.length > 0) {
+      const sortedData = sortingToggle === 'Ascending'
+        ? searchedBreweries.sort((a, b) => a.name.localeCompare(b.name)) 
+        : searchedBreweries.sort((a, b) => b.name.localeCompare(a.name));
+      setSearchedBreweries(sortedData);
+    }
+  }, [searchedBreweries, searchedBreweries?.length, sortingToggle])
+
   const searchBreweries = async (e) => {
     e.preventDefault();
     try {
       const res = await fetch(`https://api.openbrewerydb.org/breweries/search?query=${searchTerm}`);
       const data = await res.json();
-      setBreweries(data);
+      const sortedData = sortingToggle === 'Ascending' 
+        ? data.sort((a, b) => a.name.localeCompare(b.name)) 
+        : data.sort((a, b) => b.name.localeCompare(a.name));
+      setSearchedBreweries(sortedData);
     } catch (error) {
       console.error(error);
     }
@@ -36,7 +51,6 @@ export default function BreweryList() {
 
   const handleReset = () => {
     setSearchTerm('');
-    getBreweryList();
   }
 
   return (
@@ -51,7 +65,12 @@ export default function BreweryList() {
         Sort {sortingToggle === 'Ascending' ? 'Descending' : 'Ascending'}
       </button>
       <ul>
-        {breweries?.length > 0 && breweries.map(({ city, id, name, state}) => (
+        {!searchTerm && breweries?.length > 0 && breweries.map(({ city, id, name, state }) => (
+          <li key={id}>
+            <Link to={`/breweries/${id}`}>{name}</Link> - {city}, {state}
+          </li>
+        ))}
+        {searchTerm && searchedBreweries?.length > 0 && searchedBreweries.map(({ city, id, name, state }) => (
           <li key={id}>
             <Link to={`/breweries/${id}`}>{name}</Link> - {city}, {state}
           </li>
