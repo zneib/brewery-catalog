@@ -58,21 +58,23 @@ export default function BreweryList() {
       <h1>Brewery Catalog</h1>
       <form onSubmit={searchBreweries}>
         <input type='text' name='search' placeholder='Find a brewery' onChange={(e) => setSearchTerm(e.target.value)} />
-        <button type='submit'>Search</button>
-        <button type='reset' onClick={handleReset}>Reset</button>
+        <div className="btn-wrapper">
+          <button type='submit'>Search</button>
+          <button type='reset' onClick={handleReset}>Reset</button>
+        </div>
       </form>
       <button onClick={() => setSortingToggle(sortingToggle === 'Ascending' ? 'Descending' : 'Ascending')}>
         Sort {sortingToggle === 'Ascending' ? 'Descending' : 'Ascending'}
       </button>
       <ul>
-        {!searchTerm && breweries?.length > 0 && breweries.map(({ city, id, name, state }) => (
+        {!searchTerm && breweries?.length > 0 && breweries.map(({ city, id, name, state }, index) => (
           <li key={id}>
-            <Link to={`/breweries/${id}`}>{name}</Link> - {city}, {state}
+            {index + 1} - <Link to={`/breweries/${id}`}>{name}</Link> - {city}, {state}
           </li>
         ))}
-        {searchTerm && searchedBreweries?.length > 0 && searchedBreweries.map(({ city, id, name, state }) => (
+        {searchTerm && searchedBreweries?.length > 0 && searchedBreweries.map(({ city, id, name, state }, index) => (
           <li key={id}>
-            <Link to={`/breweries/${id}`}>{name}</Link> - {city}, {state}
+            {index + 1} - <Link to={`/breweries/${id}`}>{name}</Link> - {city}, {state}
           </li>
         ))}
       </ul>
